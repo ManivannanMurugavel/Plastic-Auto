@@ -1,0 +1,298 @@
+<html>
+<head>
+	<link rel="stylesheet" href="bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<script src="jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+	<script src="tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+	<script src="bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+	<style type="text/css">
+	.form-rounded {
+		border-radius: 1rem;
+	}
+	button
+	{
+		cursor: pointer;
+	}
+	table{
+        width: 100%;
+        margin: 20px 0;
+        border-collapse: collapse;
+    }
+    table, th, td{
+        border: 1px solid #cdcdcd;
+    }
+    table tr td input
+    {
+    	text-align: center;
+    }
+    table th, table td{
+        padding: 5px;
+        text-align: center;
+    }
+    #csv {
+	    white-space: pre;
+	    font-family:"Courier New", Courier, monospace;
+	    -webkit-border-radius: 6px;
+	    -moz-border-radius: 6px;
+	    border-radius: 6px;
+	    background-color: white;
+	    padding: 5px;
+	    
+	    background-repeat: no-repeat;
+	    background-position: right top;
+		background-image: url('csv.png');
+    
+}
+.csvHolder {
+    background-color: #a9a9a9;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+    margin: 5px;
+    padding: 10px;
+}
+table {
+    max-width: 100%;
+    background-color: transparent;
+    margin-bottom: 20px;
+    border-spacing: 0;
+    border: 1px solid #dddddd;
+    border-collapse: separate;
+    border-left: 0;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+table tbody tr:nth-child(odd) td {
+    background-color: #f9f9f9;
+}
+table tbody tr:nth-child(odd) td input {
+    background-color: #f9f9f9;
+}
+input {
+    margin: 2px;
+    width: 25px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+	</style>
+</head>
+<body>
+
+<!-- Button trigger modal -->
+<button type="button" id="filetxt" class="btn btn-primary d-none" data-toggle="modal" data-target="#exampleModalLong">
+  Launch demo modal
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title" id="exampleModalLongTitle">Input Strings</h1>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+	  	<textarea class="form-control form-rounded" rows="10" id="filenames"></textarea>
+      </div>
+      <div class="modal-footer">
+        <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
+        <button type="button" id="click" class="btn btn-primary">Data Convertion</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+	<div class="container">
+	    <!-- <h1>Input Strings</h1>
+	  
+	  	<textarea class="form-control form-rounded" rows="10" id="filenames"></textarea>
+	  	<br />
+		<button type="button" id="click" class="btn btn-primary btn-lg btn-block">Data Convertion</button> -->
+		<div class="row">
+		<div class="col-9">
+			<button type="button" id="start" class="btn btn-primary btn-lg btn-block">Start</button>
+		</div>
+		<div class="col">
+			<button type="button" id="addData" class="btn btn-info btn-lg btn-block">Add Data</button>
+		</div>
+		
+		</div>
+	</div>
+	<div class="container">
+		<table>
+	        <thead>
+	            <tr>
+	                <th># No</th>
+	                <th>Image Name</th>
+	                <th>1</th>
+	                <th>2</th>
+	                <th>3</th>
+	                <th>4</th>
+	                <th>5</th>
+	                <th>6</th>
+	            </tr>
+	        </thead>
+	        <tbody>
+	        </tbody>
+	    </table>
+	    <button type="button" class="btn btn-outline-info btn-lg btn-block" onclick="makeCSV()">Make CSV</button>
+	    <div class="csvHolder">
+		    <div id="csv"></div>
+		</div>
+		<div id="downloadLink"></div>
+	</div>
+
+
+	<script type="text/javascript">
+	// var plastic_data =
+	var tableData;
+	var globalinct = 0;
+	var status;
+	var jsonArray = [];
+	var jsonObject = {};
+	var totalfiles;
+	var data; 
+	var completeStatus = "inprogress";
+	var i = 0;
+	function speak(text, callback) {
+	    var u = new SpeechSynthesisUtterance();
+	    u.text = text;
+	    u.lang = 'en-US';
+	 
+	    u.onend = function () {
+	        if (callback) {
+	            callback();
+	        }
+	        console.log("Speek ended");
+	        status = 'speak';
+	        if(totalfiles == i)
+	        {
+	        	completeStatus = "completed";
+	        	return;
+	        }
+	        recognition.start();
+	    };
+	 
+	    u.onerror = function (e) {
+	        if (callback) {
+	            callback(e);
+	        }
+	    };
+	 
+	    speechSynthesis.speak(u);
+	}
+	var recognition = new webkitSpeechRecognition();
+	recognition.onresult = function(event) {
+		completeStatus = "inprogress";
+		status = 'recog';
+		// console.log(i)
+		ans = event['results'][0][0]['transcript'];
+	  	console.log(ans);
+	  	if(ans == 'for')
+	  		ans = 4;
+	  	else if(ans == 'free' || ans == 'tree')
+	  		ans = 3;
+	  	else if(ans == 'fine')
+	  		ans = 5;
+	  	jsonArray[i][ans] = 1;
+	  	console.log(jsonArray[i]);
+	  	tableData = "<tr><td>"+(globalinct+1)+"</td><td>"+jsonArray[i]['filename']+"</td><td><input type='text' value="+jsonArray[i]['1']+"></td><td><input type='text' value="+jsonArray[i]['to']+"></td><td><input type='text' value="+jsonArray[i]['3']+"></td><td><input type='text' value="+jsonArray[i]['4']+"></td><td><input type='text' value="+jsonArray[i]['5']+"></td><td><input type='text' value="+jsonArray[i]['6']+"></td></tr>";
+	  	$("table tbody").append(tableData);
+	  	jQ11("html, body").animate({ scrollTop: jQ11("body").height()+"px" });
+	  	i++;
+	  	globalinct++;
+	  	if(totalfiles == i)
+	    {
+	    	completeStatus = "completed";
+	    	speak("Finished");
+	      	return;
+	    }
+	  	text = parseInt(jsonArray[i]['filename'].replace(/[^0-9\.]/g, ''), 10).toString();
+		text = "Tell me "+text+".png";
+		speak(text)
+	}
+	recognition.onstart = function() { 
+		console.log("Started");
+	}
+	recognition.onerror = function(event) {
+		console.log("Error");
+		console.log(event)
+		if(status === "speak")
+			recognition.start();
+	}
+	recognition.onend = function() {
+		console.log("Ended");
+		console.log(status)
+		if(status === "speak")
+			recognition.start();
+	}
+	function makeCSV() {
+	    var csv = "";
+	    $('table > tbody > tr').each(function() {
+	        var sep = "";
+	        $(this).find('input').each(function(){
+	            csv += sep + $(this).val();
+	            sep = ",";
+	        });
+	        csv += "\n";
+	    });
+	    $("#csv").text(csv);
+
+	    window.URL = window.URL || window.webkiURL;
+	    var blob = new Blob([csv]);
+	    var blobURL = window.URL.createObjectURL(blob);
+	    $("#downloadLink").html("");
+	    $("<a></a>").
+	    attr("href", blobURL).
+	    attr("download", "data.csv").
+	    text("Download Data").
+	    appendTo('#downloadLink');
+	}
+
+	// recognition.start();
+	$(document).ready(function(){
+		console.log("OK");
+		$('#exampleModalLong').modal('show')
+		$("#click").click(function(){
+			completeStatus = "completed";
+		    data = $("#filenames").val();
+		    $('#exampleModalLong').modal('hide')
+		    // console.log(data);
+		    data = data.split('\n');
+		    totalfiles = data.length;
+		    jsonArray = [];
+		    $.each(data,function(key,value){
+		    	// console.log(parseInt(value));
+		    	jsonObject = {};
+		    	jsonObject['filename'] = value;
+		    	jsonObject['1'] = 0;
+		    	jsonObject['to'] = 0;
+		    	jsonObject['3'] = 0;
+		    	jsonObject['4'] = 0;
+		    	jsonObject['5'] = 0;
+		    	jsonObject['6'] = 0;
+		    	jsonArray.push(jsonObject);
+		    });
+		});
+		$("#start").click(function(){
+			if (completeStatus === 'completed') 
+				i = 0;
+			text = parseInt(jsonArray[i]['filename'].replace(/[^0-9\.]/g, ''), 10).toString();
+			text = "Tell me "+text+".png";
+			speak(text)
+		});
+		$("#addData").click(function(){
+			$('#exampleModalLong').modal('show');
+		});
+	})
+	</script>
+	<script src="jquery-1.11.0.min.js"></script>
+	<script type="text/javascript">
+		var jQ11 = $.noConflict();
+	</script>
+</body>
+</html>
